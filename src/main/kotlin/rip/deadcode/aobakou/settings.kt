@@ -9,3 +9,7 @@ data class Setting(
 data class Breadcrumb(
         val splitter: String
 )
+
+data class PageSetting(
+        val title: String
+)

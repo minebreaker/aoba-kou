@@ -53,9 +53,11 @@ fun walk(content: Path, out: Path, setting: Setting) {
             }
             if (targetFileName.endsWith(".md")) {
                 val articleOutputPath = targetPath.resolve(target.getFileNameWithoutExtension() + ".html")
+                val settingPath = target.parent.resolve(target.getFileNameWithoutExtension() + ".json")
                 Files.createDirectories(articleOutputPath.parent)
                 Files.newBufferedWriter(articleOutputPath).use {
-                    val article = generateArticle(readAll(target), setting = setting)
+                    val article = generateArticle(
+                            readAll(target), pageSetting = readJson(settingPath, PageSetting::class.java), setting = setting)
                     it.write(article)
                 }
             } else if (targetFileName.endsWith(".js") || targetFileName.endsWith(".css")) {

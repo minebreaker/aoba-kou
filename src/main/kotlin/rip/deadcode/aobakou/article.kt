@@ -21,12 +21,12 @@ private val thEngine = TemplateEngine().apply {
     setTemplateResolver(thResolver)
 }
 
-fun generateArticle(markdown: String, setting: Setting): String {
+fun generateArticle(markdown: String, pageSetting: PageSetting, setting: Setting): String {
     val nodes = markdownParser.parse(markdown)
     val content = htmlRenderer.render(nodes)
 
     val context = Context(Locale.getDefault(), mapOf(
-            "title" to "TODO title",
+            "title" to pageSetting.title,
             "site" to setting.site,
             "content" to content,
             "production" to false

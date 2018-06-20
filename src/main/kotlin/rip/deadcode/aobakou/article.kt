@@ -21,7 +21,7 @@ private val thEngine = TemplateEngine().apply {
     setTemplateResolver(thResolver)
 }
 
-fun generateArticle(markdown: String, pageSetting: PageSetting, setting: Setting): String {
+fun generateArticle(markdown: String, breadcrumb: String, pageSetting: PageSetting, setting: Setting): String {
     val nodes = markdownParser.parse(markdown)
     val content = htmlRenderer.render(nodes)
     val description = if (content.length >= 60) content.substring(0, 64) + "(...)" else content
@@ -31,6 +31,7 @@ fun generateArticle(markdown: String, pageSetting: PageSetting, setting: Setting
             "site" to setting.site,
             "content" to content,
             "description" to description,
+            "breadcrumb" to breadcrumb,
             "production" to false
     ))
     return thEngine.process("content", context)

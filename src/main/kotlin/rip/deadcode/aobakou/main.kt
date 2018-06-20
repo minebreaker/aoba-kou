@@ -18,14 +18,14 @@ fun main(args: Array<String>) {
     val setting = readJson(configPath, Setting::class.java)
 
     clean(outputPath)
-    walk(content = contentRoot, out = outputPath, setting = setting)
+    walk(contentRoot, content = contentRoot, out = outputPath, setting = setting)
 }
 
 fun clean(out: Path) {
     if (Files.exists(out)) {
         print("Removing: '${out}'. Are you sure? (y/n) > ")
         if (System.`in`.read() != 'y'.toInt()) {
-            return
+            System.exit(0)
         }
         Files.walk(out).use {
             it.sorted(Comparator.reverseOrder()).forEach {
@@ -39,25 +39,30 @@ fun clean(out: Path) {
 
 private val copyingExtensions = listOf(".html", ".css", ".js", ".png", ".jpg", ".gif")
 
-fun walk(content: Path, out: Path, setting: Setting) {
+fun walk(base: Path, content: Path, out: Path, setting: Setting) {
 
     checkState(Files.isDirectory(content))
 
     Files.list(content).use {
-        for (target in it) {
+        it.forEach { target ->
             val targetFileName = target.getFileName2()
             if (Files.isDirectory(target)) {
-                walk(target, out.resolve(targetFileName), setting)
-                continue
+                walk(base, target, out.resolve(targetFileName), setting)
+                return@forEach
             }
 
             if (targetFileName.endsWith(".md")) {
                 val articleOutputPath = out.resolve(target.getFileNameWithoutExtension() + ".html")
                 val settingPath = target.parent.resolve(target.getFileNameWithoutExtension() + ".json")
                 Files.createDirectories(out)
+
+                val pageSetting = readJson(settingPath, PageSetting::class.java)
+
+                val breadcrumb = pathToBreadcrumb(base, target, pageSetting.title, setting)
+
                 Files.newBufferedWriter(articleOutputPath).use {
                     val article = generateArticle(
-                            readAll(target), pageSetting = readJson(settingPath, PageSetting::class.java), setting = setting)
+                            readAll(target), breadcrumb, pageSetting = pageSetting, setting = setting)
                     it.write(article)
                 }
             } else {
@@ -67,6 +72,32 @@ fun walk(content: Path, out: Path, setting: Setting) {
                 }
             }
         }
+    }
+}
+
+private fun pathToBreadcrumb(base: Path, target: Path, currentPageName: String, setting: Setting): String {
+
+    val path = base.relativize(target)
+    val elements = (1 until path.nameCount).map {
+        path.subpath(0, it)
+    }.map {
+        val parentDir = base.resolve(it)
+        if (Files.exists(parentDir.resolve("index.md"))) {
+            if (target.endsWith("index.md")) {
+                ""
+            } else {
+                """<a href="/${it.toString().replace("\\", "/")}">${it.last()}</a>"""
+            }
+        } else {
+            it.last().toString()
+        }
+    }.filter {
+        it.isNotEmpty()
+    }.toList()
+    return if (target.parent == base) {
+        ""
+    } else {
+        (listOf("""<a href="/">${setting.site}</a>""") + elements + currentPageName).joinToString(setting.breadcrumb.splitter)
     }
 }
 

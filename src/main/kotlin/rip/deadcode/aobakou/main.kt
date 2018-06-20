@@ -61,7 +61,8 @@ fun walk(content: Path, out: Path, setting: Setting) {
                     it.write(article)
                 }
             } else {
-                if (Files.isRegularFile(target)) {
+                val accepts = listOf(".html", ".css", ".js", ".png", ".jpg", ".gif")
+                if (accepts.any { target.getFileName2().endsWith(it) }) {
                     Files.createDirectories(targetPath)
                     Files.copy(target, targetPath.resolve(target.getFileName2()))
                 }

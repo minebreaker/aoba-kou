@@ -23,7 +23,6 @@
 
     <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/darcula.min.css" />
     <link rel="stylesheet" href="/index.css" />
-
 </head>
 
 <body>
@@ -43,42 +42,40 @@
         </div>
     </noscript>
 
-    <div>
-        <div class="container root">
-            <!--/*@thymesVar id="site" type="java.lang.String"*/-->
-            <h2 class="site"><a class="site-link" href="/" th:text="${site}"></a></h2>
-            <!--/*@thymesVar id="title" type="java.lang.String"*/-->
-            <h1 th:text="${title}" />
-            <!--/*@thymesVar id="content" type="java.lang.String"*/-->
-            <div th:utext="${content}" />
-            <!--/*@thymesVar id="breadcrumb" type="java.lang.String"*/-->
-            <div class="breadcrumb" th:utext="${breadcrumb}"></div>
+    <div class="container root">
+        <!--/*@thymesVar id="site" type="java.lang.String"*/-->
+        <h2 class="site"><a class="site-link" href="/" th:text="${site}"></a></h2>
+        <!--/*@thymesVar id="title" type="java.lang.String"*/-->
+        <h1 th:text="${title}" />
+        <!--/*@thymesVar id="content" type="java.lang.String"*/-->
+        <div th:utext="${content}" />
+        <!--/*@thymesVar id="breadcrumb" type="java.lang.String"*/-->
+        <div class="breadcrumb" th:utext="${breadcrumb}"></div>
 
-            <!--/* Nav bar */-->
-            <div class="nav-phone transparent">
-                <a href="/">
-                    <!--/* icon-home */-->
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                         class="icon"
-                         width="48"
-                         height="48"
-                         viewBox="0 0 48 48"
-                         fill-opacity="0.4">
-                        <path d="M20 40V28h8v12h10V24h6L24 6 4 24h6v16z" />
-                    </svg>
-                </a>
-                <a href="#">
-                    <!--/* icon-uparrow */-->
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                         class="icon"
-                         width="48"
-                         height="48"
-                         viewBox="0 0 48 48"
-                         fill-opacity="0.4">
-                        <path d="M14.83 30.83L24 21.66l9.17 9.17L36 28 24 16 12 28z" />
-                    </svg>
-                </a>
-            </div>
+        <!--/* Nav bar */-->
+        <div class="nav-phone transparent">
+            <a href="/">
+                <!--/* icon-home */-->
+                <svg xmlns="http://www.w3.org/2000/svg"
+                     class="icon"
+                     width="48"
+                     height="48"
+                     viewBox="0 0 48 48"
+                     fill-opacity="0.4">
+                    <path d="M20 40V28h8v12h10V24h6L24 6 4 24h6v16z" />
+                </svg>
+            </a>
+            <a href="#">
+                <!--/* icon-uparrow */-->
+                <svg xmlns="http://www.w3.org/2000/svg"
+                     class="icon"
+                     width="48"
+                     height="48"
+                     viewBox="0 0 48 48"
+                     fill-opacity="0.4">
+                    <path d="M14.83 30.83L24 21.66l9.17 9.17L36 28 24 16 12 28z" />
+                </svg>
+            </a>
         </div>
     </div>
 

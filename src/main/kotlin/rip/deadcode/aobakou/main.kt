@@ -12,18 +12,21 @@ fun main(args: Array<String>) {
     val contentRootPathStr = checkNotNull(args[0])
     val outputPathStr = checkNotNull(args[1])
 
-    val contentRoot = Paths.get(contentRootPathStr)
-    val outputPath = Paths.get(outputPathStr)
+    val contentRoot = Paths.get(contentRootPathStr).toAbsolutePath()
+    val outputPath = Paths.get(outputPathStr).toAbsolutePath()
     val configPath = contentRoot.resolve("setting.json")
     val setting = readJson(configPath, Setting::class.java)
 
     clean(outputPath)
     walk(content = contentRoot, out = outputPath, setting = setting)
-
 }
 
 fun clean(out: Path) {
     if (Files.exists(out)) {
+        print("Removing: '${out}'. Are you sure? (y/n) > ")
+        if (System.`in`.read() != 'y'.toInt()) {
+            return
+        }
         Files.walk(out).use {
             it.sorted(Comparator.reverseOrder()).forEach {
                 if (it != out) {
@@ -34,6 +37,8 @@ fun clean(out: Path) {
     }
 }
 
+private val copyingExtensions = listOf(".html", ".css", ".js", ".png", ".jpg", ".gif")
+
 fun walk(content: Path, out: Path, setting: Setting) {
 
     checkState(Files.isDirectory(content))
@@ -42,29 +47,23 @@ fun walk(content: Path, out: Path, setting: Setting) {
         for (target in it) {
             val targetFileName = target.getFileName2()
             if (Files.isDirectory(target)) {
-                walk(target, out, setting)
+                walk(target, out.resolve(targetFileName), setting)
+                continue
             }
 
-            val targetParent = target.parent
-            val targetPath = if (targetParent.nameCount == 1) {
-                out
-            } else {
-                out.resolve(targetParent.subpath(1, targetParent.nameCount))
-            }
             if (targetFileName.endsWith(".md")) {
-                val articleOutputPath = targetPath.resolve(target.getFileNameWithoutExtension() + ".html")
+                val articleOutputPath = out.resolve(target.getFileNameWithoutExtension() + ".html")
                 val settingPath = target.parent.resolve(target.getFileNameWithoutExtension() + ".json")
-                Files.createDirectories(targetPath)
+                Files.createDirectories(out)
                 Files.newBufferedWriter(articleOutputPath).use {
                     val article = generateArticle(
                             readAll(target), pageSetting = readJson(settingPath, PageSetting::class.java), setting = setting)
                     it.write(article)
                 }
             } else {
-                val accepts = listOf(".html", ".css", ".js", ".png", ".jpg", ".gif")
-                if (accepts.any { target.getFileName2().endsWith(it) }) {
-                    Files.createDirectories(targetPath)
-                    Files.copy(target, targetPath.resolve(target.getFileName2()))
+                if (copyingExtensions.any { target.getFileName2().endsWith(it) }) {
+                    Files.createDirectories(out)
+                    Files.copy(target, out.resolve(target.getFileName2()))
                 }
             }
         }

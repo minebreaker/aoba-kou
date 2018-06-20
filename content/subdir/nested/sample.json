@@ -1,0 +1,7 @@
+{
+  "title": "Nested Sample",
+  "sidebar": {
+    "labels": ["Top"],
+    "links": ["#/index"]
+  }
+}

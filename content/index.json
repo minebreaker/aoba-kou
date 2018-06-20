@@ -1,0 +1,10 @@
+{
+  "title": "Welcome to Aoba",
+  "sidebar": {
+    "labels": ["Top", "Sample"],
+    "links": ["#/index", "#/subdir.sample"]
+  },
+  "footer": {
+    "fixed": true
+  }
+}

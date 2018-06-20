@@ -1,0 +1,44 @@
+body {
+    font-family: 'Meiryo', sans-serif;
+    font-size: 16px;
+    overflow-wrap: break-word;
+}
+
+.breadcrumb {
+    padding-top: 2.5em;
+    font-size: 0.7em;
+}
+
+pre {
+    word-break: keep-all;
+    width: 100px;
+    overflow-x: scroll;
+}
+
+pre::-webkit-scrollbar {
+    width: 8px;
+}
+
+pre::-webkit-scrollbar:horizontal {
+    height: 8px;
+}
+
+pre::-webkit-scrollbar-button {
+    display: none;
+}
+
+pre::-webkit-scrollbar-track-piece {
+    background: darkslategray;
+}
+
+pre::-webkit-scrollbar-thumb {
+    background: lightgray;
+}
+
+pre::-webkit-scrollbar-thumb:hover {
+    background: gray;
+}
+
+pre::-webkit-scrollbar-corner {
+    display: none;
+}

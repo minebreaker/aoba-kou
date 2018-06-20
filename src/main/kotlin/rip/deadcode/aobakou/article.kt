@@ -24,11 +24,13 @@ private val thEngine = TemplateEngine().apply {
 fun generateArticle(markdown: String, pageSetting: PageSetting, setting: Setting): String {
     val nodes = markdownParser.parse(markdown)
     val content = htmlRenderer.render(nodes)
+    val description = if (content.length >= 60) content.substring(0, 64) + "(...)" else content
 
     val context = Context(Locale.getDefault(), mapOf(
             "title" to pageSetting.title,
             "site" to setting.site,
             "content" to content,
+            "description" to description,
             "production" to false
     ))
     return thEngine.process("content", context)

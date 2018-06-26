@@ -17,8 +17,11 @@ fun main(args: Array<String>) {
     val configPath = contentRoot.resolve("setting.json")
     val setting = readJson(configPath, Setting::class.java)
 
+    val header = readAllIfExist(contentRoot.resolve("header.md"))
+    val footer = readAllIfExist(contentRoot.resolve("footer.md"))
+
     clean(outputPath)
-    walk(contentRoot, content = contentRoot, out = outputPath, setting = setting)
+    walk(contentRoot, content = contentRoot, header = header, footer = footer, out = outputPath, setting = setting)
 }
 
 fun clean(out: Path) {
@@ -37,21 +40,21 @@ fun clean(out: Path) {
     }
 }
 
+private val preservedFileNames = listOf("header.md", "footer.md", "setting.md")
 private val copyingExtensions = listOf(".html", ".css", ".js", ".png", ".jpg", ".gif")
 
-fun walk(base: Path, content: Path, out: Path, setting: Setting) {
+fun walk(base: Path, content: Path, header: String, footer: String, out: Path, setting: Setting) {
 
     checkState(Files.isDirectory(content))
 
     Files.list(content).use {
         it.forEach { target ->
             val targetFileName = target.getFileName2()
-            if (Files.isDirectory(target)) {
-                walk(base, target, out.resolve(targetFileName), setting)
-                return@forEach
-            }
 
-            if (targetFileName.endsWith(".md")) {
+            if (Files.isDirectory(target)) {
+                walk(base, target, header, footer, out.resolve(targetFileName), setting)
+
+            } else if (targetFileName.endsWith(".md") && !preservedFileNames.contains(targetFileName)) {
                 val articleOutputPath = out.resolve(target.getFileNameWithoutExtension() + ".html")
                 val settingPath = target.parent.resolve(target.getFileNameWithoutExtension() + ".json")
                 Files.createDirectories(out)
@@ -62,9 +65,10 @@ fun walk(base: Path, content: Path, out: Path, setting: Setting) {
 
                 Files.newBufferedWriter(articleOutputPath).use {
                     val article = generateArticle(
-                            readAll(target), breadcrumb, pageSetting = pageSetting, setting = setting)
+                            readAll(target), header, footer, breadcrumb, pageSetting = pageSetting, setting = setting)
                     it.write(article)
                 }
+
             } else {
                 if (copyingExtensions.any { target.getFileName2().endsWith(it) }) {
                     Files.createDirectories(out)
@@ -102,6 +106,8 @@ private fun pathToBreadcrumb(base: Path, target: Path, currentPageName: String, 
 }
 
 private fun readAll(path: Path): String = Files.readAllBytes(path).toString(StandardCharsets.UTF_8)
+
+private fun readAllIfExist(path: Path): String = if (Files.exists(path)) readAll(path) else ""
 
 private fun Path.getFileName2(): String = this.fileName.toString()
 

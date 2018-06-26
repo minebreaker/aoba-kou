@@ -21,10 +21,21 @@ private val thEngine = TemplateEngine().apply {
     setTemplateResolver(thResolver)
 }
 
-fun generateArticle(markdown: String, header: String, footer: String, breadcrumb: String, pageSetting: PageSetting, setting: Setting): String {
-    val nodes = markdownParser.parse(markdown)
-    val content = htmlRenderer.render(nodes)
-    val description = if (content.length >= 60) content.substring(0, 64) + "(...)" else content
+private fun parseMarkdown(markdown: String): String = htmlRenderer.render(markdownParser.parse(markdown))
+
+fun generateArticle(contentMd: String,
+        headerMd: String,
+        footerMd: String,
+        metaMd: String,
+        breadcrumb: String,
+        pageSetting: PageSetting,
+        setting: Setting): String {
+
+    val content = parseMarkdown(contentMd)
+    val description = if (content.length >= 60) content.substring(0, 64) + "(...)" else content  // TODO remove tags
+    val header = parseMarkdown(headerMd)
+    val footer = parseMarkdown(footerMd)
+    val meta = parseMarkdown(metaMd)
 
     val context = Context(Locale.getDefault(), mapOf(
             "title" to pageSetting.title,
@@ -33,6 +44,7 @@ fun generateArticle(markdown: String, header: String, footer: String, breadcrumb
             "description" to description,
             "header" to header,
             "footer" to footer,
+            "meta" to meta,
             "breadcrumb" to breadcrumb,
             "production" to false
     ))

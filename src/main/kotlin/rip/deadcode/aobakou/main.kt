@@ -17,11 +17,12 @@ fun main(args: Array<String>) {
     val configPath = contentRoot.resolve("setting.json")
     val setting = readJson(configPath, Setting::class.java)
 
+    val meta = readAllIfExist(contentRoot.resolve("meta.md"))
     val header = readAllIfExist(contentRoot.resolve("header.md"))
     val footer = readAllIfExist(contentRoot.resolve("footer.md"))
 
     clean(outputPath)
-    walk(contentRoot, content = contentRoot, header = header, footer = footer, out = outputPath, setting = setting)
+    walk(contentRoot, content = contentRoot, header = header, footer = footer, meta = meta, out = outputPath, setting = setting)
 }
 
 fun clean(out: Path) {
@@ -40,10 +41,10 @@ fun clean(out: Path) {
     }
 }
 
-private val preservedFileNames = listOf("header.md", "footer.md", "setting.md")
+private val preservedFileNames = listOf("header.md", "footer.md", "meta.md", "setting.md")
 private val copyingExtensions = listOf(".html", ".css", ".js", ".png", ".jpg", ".gif")
 
-fun walk(base: Path, content: Path, header: String, footer: String, out: Path, setting: Setting) {
+fun walk(base: Path, content: Path, header: String, footer: String, meta: String, out: Path, setting: Setting) {
 
     checkState(Files.isDirectory(content))
 
@@ -52,7 +53,7 @@ fun walk(base: Path, content: Path, header: String, footer: String, out: Path, s
             val targetFileName = target.getFileName2()
 
             if (Files.isDirectory(target)) {
-                walk(base, target, header, footer, out.resolve(targetFileName), setting)
+                walk(base, target, header, footer, meta, out.resolve(targetFileName), setting)
 
             } else if (targetFileName.endsWith(".md") && !preservedFileNames.contains(targetFileName)) {
                 val articleOutputPath = out.resolve(target.getFileNameWithoutExtension() + ".html")
@@ -65,7 +66,7 @@ fun walk(base: Path, content: Path, header: String, footer: String, out: Path, s
 
                 Files.newBufferedWriter(articleOutputPath).use {
                     val article = generateArticle(
-                            readAll(target), header, footer, breadcrumb, pageSetting = pageSetting, setting = setting)
+                            readAll(target), header, footer, meta, breadcrumb, pageSetting = pageSetting, setting = setting)
                     it.write(article)
                 }
 
@@ -85,6 +86,7 @@ private fun pathToBreadcrumb(base: Path, target: Path, currentPageName: String, 
     val elements = (1 until path.nameCount).map {
         path.subpath(0, it)
     }.map {
+        // TODO なんか連続するindexが無視される
         val parentDir = base.resolve(it)
         if (Files.exists(parentDir.resolve("index.md"))) {
             if (target.endsWith("index.md")) {

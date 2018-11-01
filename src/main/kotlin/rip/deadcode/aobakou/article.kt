@@ -41,6 +41,7 @@ fun generateArticle(contentMd: String,
     val meta = parseMarkdown(metaMd)
 
     val context = Context(Locale.getDefault(), mapOf(
+            "lang" to setting.lang,
             "title" to pageSetting.title,
             "site" to setting.site,
             "content" to content,

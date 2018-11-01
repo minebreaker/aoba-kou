@@ -1,6 +1,7 @@
 package rip.deadcode.aobakou
 
 data class Setting(
+        val lang: String,
         val site: String,
         val notification: String,
         val breadcrumb: Breadcrumb

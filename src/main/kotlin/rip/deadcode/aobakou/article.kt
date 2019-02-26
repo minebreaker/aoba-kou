@@ -1,5 +1,7 @@
 package rip.deadcode.aobakou
 
+import com.vladsch.flexmark.ext.emoji.EmojiExtension
+import com.vladsch.flexmark.ext.footnotes.FootnoteExtension
 import com.vladsch.flexmark.ext.tables.TablesExtension
 import com.vladsch.flexmark.html.HtmlRenderer
 import com.vladsch.flexmark.parser.Parser
@@ -11,8 +13,12 @@ import org.thymeleaf.context.Context
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver
 import java.util.*
 
-private val markdownOption = MutableDataSet()
-        .set(Parser.EXTENSIONS, listOf(TablesExtension.create()))
+private val markdownOption = MutableDataSet().set(Parser.EXTENSIONS, listOf(
+        TablesExtension.create(),
+        FootnoteExtension.create(),
+        EmojiExtension.create(),
+        MyAnchorLinkExtension()
+))
 private val markdownParser = Parser.builder(markdownOption).build()
 private val htmlRenderer = HtmlRenderer.builder(markdownOption).build()
 

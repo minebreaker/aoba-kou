@@ -42,7 +42,7 @@ fun clean(out: Path) {
 }
 
 private val preservedFileNames = listOf("header.md", "footer.md", "meta.md", "setting.md")
-private val copyingExtensions = listOf(".html", ".css", ".js", ".png", ".jpg", ".gif")
+private val copyingExtensions = listOf(".html", ".css", ".js", ".json", ".png", ".jpg", ".gif")
 
 fun walk(base: Path, content: Path, header: String, footer: String, meta: String, out: Path, setting: Setting) {
 

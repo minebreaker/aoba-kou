@@ -9,3 +9,5 @@
 * index.jsの存在チェック
 * 固定値をsetting.jsonへ移す
     * デフォルトスクリプト
+* articleタグ
+* 目次生成

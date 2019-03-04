@@ -13,3 +13,4 @@
 * articleタグ
 * 目次生成
 * DI
+* Word count

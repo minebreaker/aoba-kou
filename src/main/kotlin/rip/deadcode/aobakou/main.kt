@@ -22,7 +22,15 @@ fun main(args: Array<String>) {
     val footer = readAllIfExist(contentRoot.resolve("footer.md"))
 
     clean(outputPath)
-    walk(contentRoot, content = contentRoot, header = header, footer = footer, meta = meta, out = outputPath, setting = setting)
+
+    val indexList = walk(contentRoot, content = contentRoot, header = header, footer = footer, meta = meta, out = outputPath, setting = setting)
+
+    /*
+    [ {"title": "ページタイトル", "headers": [ {"path": "URL", "header": "ヘッダーテキスト"} ]} ]
+     */
+    Files.newBufferedWriter(outputPath.resolve("searchIndex.json"), StandardCharsets.UTF_8).use {
+        gson.toJson(indexList, it)
+    }
 }
 
 fun clean(out: Path) {
@@ -44,16 +52,19 @@ fun clean(out: Path) {
 private val preservedFileNames = listOf("header.md", "footer.md", "meta.md", "setting.md")
 private val copyingExtensions = listOf(".html", ".css", ".js", ".json", ".png", ".jpg", ".gif")
 
-fun walk(base: Path, content: Path, header: String, footer: String, meta: String, out: Path, setting: Setting) {
+fun walk(base: Path, content: Path, header: String, footer: String, meta: String, out: Path, setting: Setting): List<Map<String, Any>> {
 
     checkState(Files.isDirectory(content))
+
+    val indexList = mutableListOf<Map<String, Any>>()
 
     Files.list(content).use {
         it.forEach { target ->
             val targetFileName = target.getFileName2()
 
             if (Files.isDirectory(target)) {
-                walk(base, target, header, footer, meta, out.resolve(targetFileName), setting)
+                val result = walk(base, target, header, footer, meta, out.resolve(targetFileName), setting)
+                indexList.addAll(result)
 
             } else if (targetFileName.endsWith(".md") && !preservedFileNames.contains(targetFileName)) {
                 val articleOutputPath = out.resolve(target.getFileNameWithoutExtension() + ".html")
@@ -63,11 +74,20 @@ fun walk(base: Path, content: Path, header: String, footer: String, meta: String
                 val pageSetting = readJson(settingPath, PageSetting::class.java)
 
                 val breadcrumb = pathToBreadcrumb(base, target, pageSetting.title, setting)
+                val absoluteUrlStr = target.toString().substring(base.toString().length)
 
                 Files.newBufferedWriter(articleOutputPath).use {
-                    val article = generateArticle(
+                    val (article, index) = generateArticle(
                             readAll(target), header, footer, meta, breadcrumb, pageSetting = pageSetting, setting = setting)
                     it.write(article)
+
+                    indexList.add(mapOf(
+                            "title" to pageSetting.title,
+                            "headers" to index.map {
+                                mapOf(
+                                        "path" to (absoluteUrlStr + "#" + it.anchorRefId).replace('\\', '/'),
+                                        "header" to it.anchorRefText)
+                            }))
                 }
 
             } else {
@@ -78,6 +98,8 @@ fun walk(base: Path, content: Path, header: String, footer: String, meta: String
             }
         }
     }
+
+    return indexList
 }
 
 private fun pathToBreadcrumb(base: Path, target: Path, currentPageName: String, setting: Setting): String {

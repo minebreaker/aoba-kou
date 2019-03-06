@@ -33,17 +33,20 @@ private val thEngine = TemplateEngine().apply {
 
 private fun parseMarkdown(markdown: String): String = htmlRenderer.render(markdownParser.parse(markdown))
 
+data class ArticleResult(val articleHtml: String, val headers: List<Heading>)
+
 fun generateArticle(contentMd: String,
         headerMd: String,
         footerMd: String,
         metaMd: String,
         breadcrumb: String,
         pageSetting: PageSetting,
-        setting: Setting): String {
+        setting: Setting): ArticleResult {
 
     val nodes = markdownParser.parse(contentMd)
     val content = htmlRenderer.render(nodes)
-    val index = renderHeaders(flattenHeaders(nodes))
+    val headers = flattenHeaders(nodes)
+    val index = renderHeaders(headers)
     val escapedContent = Jsoup.clean(content, Whitelist.none())
     val description = if (escapedContent.length >= 96) escapedContent.substring(0, 90) + "(...)" else escapedContent
     val header = parseMarkdown(headerMd)
@@ -63,7 +66,7 @@ fun generateArticle(contentMd: String,
             "breadcrumb" to breadcrumb,
             "production" to false
     ))
-    return thEngine.process("content", context)
+    return ArticleResult(thEngine.process("content", context), headers)
 }
 
 private fun flattenHeaders(node: Node): List<Heading> {

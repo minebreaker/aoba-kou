@@ -31,7 +31,7 @@
 <body>
 
 <div class="container root">
-    <main role="main">
+    <main>
         <!--/*@thymesVar id="site" type="java.lang.String"*/-->
         <h2 class="site"><a class="site-link" href="/" th:text="${site}"></a></h2>
         <!--/*@thymesVar id="header" type="java.lang.String"*/-->
@@ -39,7 +39,7 @@
         <!--/*@thymesVar id="title" type="java.lang.String"*/-->
         <h1 class="title" th:text="${title}" />
         <!--/*@thymesVar id="content" type="java.lang.String"*/-->
-        <div class="content" th:utext="${content}" />
+        <div class="content" th:utext="${content}"></div>
         <!--/*@thymesVar id="breadcrumb" type="java.lang.String"*/-->
         <div class="breadcrumb" th:utext="${breadcrumb}"></div>
         <!--/*@thymesVar id="footer" type="java.lang.String"*/-->

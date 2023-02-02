@@ -9,7 +9,7 @@ import com.vladsch.flexmark.parser.Parser
 import com.vladsch.flexmark.util.ast.Node
 import com.vladsch.flexmark.util.options.MutableDataSet
 import org.jsoup.Jsoup
-import org.jsoup.safety.Whitelist
+import org.jsoup.safety.Safelist
 import org.thymeleaf.TemplateEngine
 import org.thymeleaf.context.Context
 import org.thymeleaf.templateresolver.ClassLoaderTemplateResolver
@@ -47,7 +47,7 @@ fun generateArticle(contentMd: String,
     val content = htmlRenderer.render(nodes)
     val headers = flattenHeaders(nodes)
     val index = renderHeaders(headers)
-    val escapedContent = Jsoup.clean(content, Whitelist.none())
+    val escapedContent = Jsoup.clean(content, Safelist.none())
     val description = if (escapedContent.length >= 96) escapedContent.substring(0, 90) + "(...)" else escapedContent
     val header = parseMarkdown(headerMd)
     val footer = parseMarkdown(footerMd)

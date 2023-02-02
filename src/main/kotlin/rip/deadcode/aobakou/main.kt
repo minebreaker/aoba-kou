@@ -5,6 +5,7 @@ import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
+import kotlin.system.exitProcess
 
 fun main(args: Array<String>) {
 
@@ -36,8 +37,8 @@ fun main(args: Array<String>) {
 fun clean(out: Path) {
     if (Files.exists(out)) {
         print("Removing: '${out}'. Are you sure? (y/n) > ")
-        if (System.`in`.read() != 'y'.toInt()) {
-            System.exit(0)
+        if (System.`in`.read() != 'y'.code) {
+            exitProcess(0)
         }
         Files.walk(out).use {
             it.sorted(Comparator.reverseOrder()).forEach {
